@@ -1,0 +1,32 @@
+type SKUSpecificationField {
+  name: String!
+}
+
+type SKUSpecificationValue {
+  name: String!
+}
+
+type SkuSpecification {
+  field: SKUSpecificationField!
+  values: [SKUSpecificationValue]!
+}
+
+type ItemImage {
+  imageId: String!
+  imageLabel: String
+  imageUrl: String!
+  imageText: String
+}
+
+type Items {
+  itemId: String!
+  images: [ItemImage]!
+  quantity: Int
+  size: String
+  color: String
+}
+
+type Variations {
+  items: [Items!]!
+  skuSpecifications: [SkuSpecification!]
+}

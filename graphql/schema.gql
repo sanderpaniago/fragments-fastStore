@@ -1,0 +1,12 @@
+type StoreProduct {
+  variations: Variations
+}
+
+type Query {
+  shipping(
+    postalCode: String
+    geoCoordinates: [String]
+    country: String
+    items: [ShippingItem]
+  ): ShippingData
+}
