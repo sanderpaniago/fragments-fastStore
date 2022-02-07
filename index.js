@@ -3,6 +3,7 @@ const resolvers = {
     shipping,
   },
   StoreProduct: {
-    variations,
+    items,
+    skuSpecifications,
   },
 };
