@@ -1,7 +1,4 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-/* eslint import/no-nodejs-modules: ["error", {"allow": ["path"]}] */
-/* eslint import/order: ["error", {"warnOnUnassignedImports": true}] */
-const path = require("path");
 const {
   envelop,
   useExtendContext,
@@ -25,7 +22,7 @@ const getTranslateReview = require("./resolvers/getTranslatedReview");
 const postReviewVote = require("./resolvers/postReviewVote");
 const shipping = require("./resolvers/shipping");
 
-const typesArray = loadFilesSync(path.join(__dirname, "."), {
+const typesArray = loadFilesSync("./src/server", {
   extensions: ["gql"],
 });
 
@@ -44,7 +41,7 @@ const apiSchema = getSchema(apiOptions);
 const apiContextFactory = getContextFactory(apiOptions);
 
 const resolvers = {
-  // .... your resolvers
+  // ... your resolvers
 };
 
 const getMergedSchema = async () => {
