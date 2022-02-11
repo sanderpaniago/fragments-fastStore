@@ -49,6 +49,12 @@ type StoreProduct {
   skuSpecifications: [SkuSpecification!]
 }
 
+input ShippingItem {
+  id: String
+  quantity: String
+  seller: String
+}
+
 type Query {
   shipping(
     postalCode: String
