@@ -1,26 +1,24 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-const {
+import {
   envelop,
   useExtendContext,
   useMaskedErrors,
   useSchema,
-} = require("@envelop/core");
-const { useGraphQlJit } = require("@envelop/graphql-jit");
-const { useParserCache } = require("@envelop/parser-cache");
-const { useValidationCache } = require("@envelop/validation-cache");
-const { getContextFactory, getSchema } = require("@faststore/api");
-const { makeExecutableSchema, mergeSchemas } = require("@graphql-tools/schema");
-const { GraphQLError } = require("graphql");
-const { loadFilesSync } = require("@graphql-tools/load-files");
-const { mergeTypeDefs } = require("@graphql-tools/merge");
+} from "@envelop/core";
+import { useGraphQlJit } from "@envelop/graphql-jit";
+import { useParserCache } from "@envelop/parser-cache";
+import { useValidationCache } from "@envelop/validation-cache";
+import {
+  getContextFactory as getContextFactoryVtex,
+  getSchema as getSchemaVtex,
+} from "@faststore/api";
+import { makeExecutableSchema, mergeSchemas } from "@graphql-tools/schema";
+import { GraphQLError } from "graphql";
+import { loadFilesSync } from "@graphql-tools/load-files";
+import { mergeTypeDefs } from "@graphql-tools/merge";
 
-const persisted = require("../../@generated/graphql/persisted.json");
-const storeConfig = require("../../store.config");
-const getDataProduct = require("./resolvers/items");
-const getRating = require("./resolvers/getRating");
-const getTranslateReview = require("./resolvers/getTranslatedReview");
-const postReviewVote = require("./resolvers/postReviewVote");
-const shipping = require("./resolvers/shipping");
+import persisted from "../../@generated/graphql/persisted.json";
+import storeConfig from "../../store.config";
 
 const typesArray = loadFilesSync("./src/server", {
   extensions: ["gql"],
@@ -37,24 +35,27 @@ const apiOptions = {
   channel: storeConfig.channel,
 };
 
-const apiSchema = getSchema(apiOptions);
-const apiContextFactory = getContextFactory(apiOptions);
+const getSchema = getSchemaVtex(apiOptions as any);
+
+const getContextFac = getContextFactoryVtex(apiOptions as any);
+
+export const getContextFactory = () => getContextFac;
 
 const resolvers = {
-  // ... your resolvers
+  // ...your resolvers
 };
 
-const getMergedSchema = async () => {
+export const getMergedSchema = async () => {
   return mergeSchemas({
-    schemas: [await apiSchema, makeExecutableSchema({ typeDefs, resolvers })],
+    schemas: [await getSchema, makeExecutableSchema({ typeDefs, resolvers })],
   });
 };
 
-const isBadRequestError = (err) => {
+const isBadRequestError = (err: any) => {
   return err.originalError && err.originalError.name === "BadRequestError";
 };
 
-const formatError = (err) => {
+const formatError = (err: any) => {
   console.error(err);
 
   if (err instanceof GraphQLError && isBadRequestError(err)) {
@@ -68,7 +69,7 @@ const getEnvelop = async () =>
   envelop({
     plugins: [
       useSchema(await getMergedSchema()),
-      useExtendContext(apiContextFactory),
+      useExtendContext(getContextFac),
       useMaskedErrors({ formatError }),
       useGraphQlJit(),
       useValidationCache(),
@@ -78,7 +79,7 @@ const getEnvelop = async () =>
 
 const envelopPromise = getEnvelop();
 
-const execute = async (options, envelopContext = {}) => {
+export const execute = async (options: any, envelopContext = {}) => {
   const { operationName, variables, query: maybeQuery } = options;
   const query = maybeQuery || persistedQueries.get(operationName);
 
@@ -101,11 +102,4 @@ const execute = async (options, envelopContext = {}) => {
     contextValue: await contextFactory({}),
     operationName,
   });
-};
-
-module.exports = {
-  execute,
-  getSchema: () => apiSchema,
-  getContextFactory: () => apiContextFactory,
-  getMergedSchema,
 };
